@@ -13,6 +13,9 @@
 - pnpm >= 10
 - Docker & Docker Compose
 
+## Architecture
+![alt text](./architecture.png)
+
 ## Quick Start (Docker Compose)
 
 This spins up all three services plus Postgres, Redis, and LocalStack:

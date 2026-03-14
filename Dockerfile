@@ -28,8 +28,8 @@ COPY --from=build --chown=node:node /app/dist ./dist
 # Use the node user from the image
 USER node
 
-# Expose port 8080
-EXPOSE 8080
+# Expose ports for collector (8081) and query (8082)
+EXPOSE 8081 8082
 
-# Start the server
-CMD ["node", "dist/index.js"]
+# Default CMD — overridden per service in docker-compose
+CMD ["node", "dist/collector.js"]

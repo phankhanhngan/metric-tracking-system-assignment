@@ -15,6 +15,6 @@
 		"forceConsistentCasingInFileNames": true,
 		"types": ["vitest/globals"]
 	},
-	"include": ["src/**/*"],
+	"include": ["src/**/*", "src/scripts/sqsBufferWorker.ts", "src/scripts/generateMetrics.ts"],
 	"exclude": ["node_modules"]
 }

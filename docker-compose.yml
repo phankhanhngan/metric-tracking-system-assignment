@@ -1,0 +1,110 @@
+services:
+  postgres:
+    image: timescale/timescaledb:latest-pg17
+    container_name: everfit_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: metric_tracking
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - data_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: everfit_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - data_net
+
+  localstack:
+    image: localstack/localstack
+    container_name: everfit_localstack
+    environment:
+      SERVICES: "sqs"
+      HOSTNAME: localstack
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+    ports:
+      - "4566:4566"
+    networks:
+      - data_net
+
+  metric-collector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: everfit_collector
+    ports:
+      - "8081:8081"
+    environment:
+      NODE_ENV: production
+      COLLECTOR_PORT: 8081
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/metric_tracking
+      REDIS_URL: redis://redis:6379
+      SQS_ENDPOINT: http://localstack:4566
+      SQS_QUEUE_NAME: metrics-queue
+      LAMBDA_SECRET: super-secret-key
+      CORS_ORIGIN: http://localhost:8081
+    depends_on:
+      - postgres
+      - redis
+      - localstack
+    command: ["node", "dist/collectorApp.js"]
+    networks:
+      - data_net
+
+  metric-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: everfit_consumer
+    ports:
+      - "8083:8083"
+    environment:
+      NODE_ENV: production
+      CONSUMER_PORT: 8083
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/metric_tracking
+      REDIS_URL: redis://redis:6379
+      SQS_ENDPOINT: http://localstack:4566
+      SQS_QUEUE_NAME: metrics-queue
+      LAMBDA_SECRET: super-secret-key
+      CORS_ORIGIN: http://localhost:8083
+    depends_on:
+      - postgres
+      - redis
+      - localstack
+    command: ["node", "dist/consumerApp.js"]
+    networks:
+      - data_net
+
+  metric-query:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: everfit_query
+    ports:
+      - "8082:8082"
+    environment:
+      NODE_ENV: production
+      QUERY_PORT: 8082
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/metric_tracking
+      REDIS_URL: redis://redis:6379
+      LAMBDA_SECRET: super-secret-key
+      CORS_ORIGIN: http://localhost:8082
+    depends_on:
+      - postgres
+      - redis
+    command: ["node", "dist/queryApp.js"]
+    networks:
+      - data_net
+
+networks:
+  data_net:
+
+volumes:
+  pgdata:

@@ -15,6 +15,8 @@
 
 ## Architecture
 
+RFC: [Engineering Document](./EngDoc.pdf)
+
 ![architecture](./images/architecture.png)
 
 ## Quick Start (Docker Compose)

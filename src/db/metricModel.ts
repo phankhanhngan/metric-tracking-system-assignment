@@ -54,9 +54,13 @@ export const CreateMetricSchema = z.object({
       path: ["unit"],
     }),
 });
+export type CreateMetricSchemaParam = z.infer<
+  typeof CreateMetricSchema
+>["params"];
+export type CreateMetricBody = z.infer<typeof CreateMetricSchema>["body"];
 
 // POST /metrics/batch
-export const BatchMetricSchema = z.object({
+export const CreateBatchMetricSchema = z.object({
   metrics: z.array(
     z.object({
       user_id: z.string(),
@@ -68,22 +72,31 @@ export const BatchMetricSchema = z.object({
     }),
   ),
 });
+export type CreateBatchMetricSchemaBody = z.infer<
+  typeof CreateBatchMetricSchema
+>;
 
 // GET /metrics/:userId/list
-export const GetMetricsSchema = z.object({
+export const ListMetricsSchema = z.object({
   params: z.object({
     userId: z.string().min(1, "userId is required"),
   }),
   query: z.object({
     type: z.enum(MetricTypes),
     unit: z.enum(allUnits).optional(),
-    limit: z.coerce.number().int().positive().default(50),
-    offset: z.coerce.number().int().min(0).default(0),
+    limit: z.coerce.number().int().positive("limit must be postive number"),
+    offset: z.coerce
+      .number()
+      .int()
+      .min(0, "offset must be non-negative number"),
   }),
 });
 
+export type ListMetricsQuery = z.infer<typeof ListMetricsSchema>["query"];
+export type ListMetricsParams = z.infer<typeof ListMetricsSchema>["params"];
+
 // GET /metrics/:userId/chart
-export const GetChartSchema = z.object({
+export const GetMetricChartSchema = z.object({
   params: z.object({
     userId: z.string().min(1, "userId is required"),
   }),
@@ -100,3 +113,8 @@ export const GetChartSchema = z.object({
       .optional(),
   }),
 });
+
+export type GetMetricChartQuery = z.infer<typeof GetMetricChartSchema>["query"];
+export type GetMetricChartParams = z.infer<
+  typeof GetMetricChartSchema
+>["params"];

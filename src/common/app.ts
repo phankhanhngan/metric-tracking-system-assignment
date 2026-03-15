@@ -8,20 +8,20 @@ import requestLogger from "@/common/middleware/requestLogger";
 import { env } from "@/common/utils/envConfig";
 
 export function createApp(): Express {
-	const app = express();
+  const app = express();
 
-	app.set("trust proxy", true);
+  app.set("trust proxy", true);
 
-	app.use(express.json());
-	app.use(express.urlencoded({ extended: true }));
-	app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
-	app.use(helmet());
-	app.use(rateLimiter);
-	app.use(requestLogger);
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+  app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
+  app.use(helmet());
+  app.use(rateLimiter);
+  app.use(requestLogger);
 
-	return app;
+  return app;
 }
 
 export function finalize(app: Express): void {
-	app.use(errorHandler());
+  app.use(errorHandler());
 }

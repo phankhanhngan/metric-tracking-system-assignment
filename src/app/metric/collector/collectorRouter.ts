@@ -11,16 +11,22 @@ export const collectorRegistry = new OpenAPIRegistry();
 export const collectorRouter: Router = express.Router();
 
 collectorRegistry.registerPath({
-	method: "post",
-	path: "/metrics/{userId}",
-	tags: ["Metric Collector"],
-	request: {
-		params: CreateMetricSchema.shape.params,
-		body: {
-			content: { "application/json": { schema: CreateMetricSchema.shape.body } },
-		},
-	},
-	responses: createApiResponse(z.null(), "Metric accepted for processing", 202),
+  method: "post",
+  path: "/metrics/{userId}",
+  tags: ["Metric Collector"],
+  request: {
+    params: CreateMetricSchema.shape.params,
+    body: {
+      content: {
+        "application/json": { schema: CreateMetricSchema.shape.body },
+      },
+    },
+  },
+  responses: createApiResponse(z.null(), "Metric accepted for processing", 202),
 });
 
-collectorRouter.post("/:userId", validateRequest(CreateMetricSchema), createMetric);
+collectorRouter.post(
+  "/:userId",
+  validateRequest(CreateMetricSchema),
+  createMetric,
+);

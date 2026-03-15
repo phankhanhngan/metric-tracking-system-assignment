@@ -19,23 +19,28 @@ app.use(openAPIRouter);
 finalize(app);
 
 const server = app.listen(env.COLLECTOR_PORT, async () => {
-	logger.info(`Collector (${env.NODE_ENV}) running on port ${env.COLLECTOR_PORT}`);
+  logger.info(
+    `Collector (${env.NODE_ENV}) running on port ${env.COLLECTOR_PORT}`,
+  );
 
-	// Ensure SQS queue exists, then start consumer
-	try {
-		await ensureQueue();
-	} catch (err) {
-		logger.error({ err }, "Failed to start SQS consumer — will retry on next message");
-	}
+  // Ensure SQS queue exists, then start consumer
+  try {
+    await ensureQueue();
+  } catch (err) {
+    logger.error(
+      { err },
+      "Failed to start SQS consumer — will retry on next message",
+    );
+  }
 });
 
 const onCloseSignal = () => {
-	logger.info("Shutting down collector");
-	server.close(() => {
-		logger.info("Collector closed");
-		process.exit();
-	});
-	setTimeout(() => process.exit(1), 10000).unref();
+  logger.info("Shutting down collector");
+  server.close(() => {
+    logger.info("Collector closed");
+    process.exit();
+  });
+  setTimeout(() => process.exit(1), 10000).unref();
 };
 
 process.on("SIGINT", onCloseSignal);

@@ -5,7 +5,12 @@ import { z } from "zod";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { getMetrics, getChart } from "./queryController";
-import { ChartDataPointSchema, GetChartSchema, GetMetricsSchema, MetricResponseSchema } from "../../../db/metricModel";
+import {
+  ChartDataPointSchema,
+  GetMetricChartSchema,
+  ListMetricsSchema,
+  MetricResponseSchema,
+} from "../../../db/metricModel";
 
 export const queryRegistry = new OpenAPIRegistry();
 export const queryRouter: Router = express.Router();
@@ -15,28 +20,36 @@ queryRegistry.register("ChartDataPoint", ChartDataPointSchema);
 
 // GET /metrics/list/:userId
 queryRegistry.registerPath({
-	method: "get",
-	path: "/metrics/list/{userId}",
-	tags: ["Metric Query"],
-	request: {
-		params: GetMetricsSchema.shape.params,
-		query: GetMetricsSchema.shape.query,
-	},
-	responses: createApiResponse(z.array(MetricResponseSchema), "Success"),
+  method: "get",
+  path: "/metrics/{userId}/list",
+  tags: ["Metric Query"],
+  request: {
+    params: ListMetricsSchema.shape.params,
+    query: ListMetricsSchema.shape.query,
+  },
+  responses: createApiResponse(z.array(MetricResponseSchema), "Success"),
 });
 
-queryRouter.get("/list/:userId", validateRequest(GetMetricsSchema), getMetrics);
+queryRouter.get(
+  "/:userId/list",
+  validateRequest(ListMetricsSchema),
+  getMetrics,
+);
 
 // GET /metrics/chart/:userId
 queryRegistry.registerPath({
-	method: "get",
-	path: "/metrics/chart/{userId}",
-	tags: ["Metric Query"],
-	request: {
-		params: GetChartSchema.shape.params,
-		query: GetChartSchema.shape.query,
-	},
-	responses: createApiResponse(z.array(ChartDataPointSchema), "Success"),
+  method: "get",
+  path: "/metrics/{userId}/chart",
+  tags: ["Metric Query"],
+  request: {
+    params: GetMetricChartSchema.shape.params,
+    query: GetMetricChartSchema.shape.query,
+  },
+  responses: createApiResponse(z.array(ChartDataPointSchema), "Success"),
 });
 
-queryRouter.get("/chart/:userId", validateRequest(GetChartSchema), getChart);
+queryRouter.get(
+  "/:userId/chart",
+  validateRequest(GetMetricChartSchema),
+  getChart,
+);

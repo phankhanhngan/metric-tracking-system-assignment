@@ -1,20 +1,24 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"module": "ESNext",
-		"baseUrl": "./src",
-		"paths": {
-			"@/*": ["*"]
-		},
-		"moduleResolution": "Node",
-		"outDir": "dist",
-		"importsNotUsedAsValues": "remove",
-		"strict": true,
-		"esModuleInterop": true,
-		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true,
-		"types": ["vitest/globals"]
-	},
-	"include": ["src/**/*", "src/scripts/sqsBufferWorker.ts", "src/scripts/generateMetrics.ts"],
-	"exclude": ["node_modules"]
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    },
+    "moduleResolution": "Node",
+    "outDir": "dist",
+    "importsNotUsedAsValues": "remove",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["vitest/globals"]
+  },
+  "include": [
+    "src/**/*",
+    "src/scripts/sqsBufferWorker.ts",
+    "src/scripts/generateMetrics.ts"
+  ],
+  "exclude": ["node_modules"]
 }

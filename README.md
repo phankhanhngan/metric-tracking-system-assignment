@@ -14,7 +14,8 @@
 - Docker & Docker Compose
 
 ## Architecture
-![alt text](./architecture.png)
+
+![architecture](./images/architecture.png)
 
 ## Quick Start (Docker Compose)
 
@@ -25,10 +26,11 @@ docker compose up --build
 ```
 
 Services will be available at:
+
 - Collector: http://localhost:8081
 - Query: http://localhost:8082
 - Consumer: http://localhost:8083
-
+- Swagger: http://localhost:8081
 
 ## Local Development
 
@@ -54,6 +56,7 @@ pnpm prisma:migrate
 ## Database
 
 Uses TimescaleDB hypertables with:
+
 - 1-month chunk intervals for time-series partitioning
 - Composite index on `(user_id, type, date DESC)`
 - Automatic retention: drops data older than 1 year
@@ -78,15 +81,57 @@ pnpm test          # Run all tests
 pnpm test:cov      # Run with coverage
 ```
 
+**Endpoints:**
+
+1. Add metric
+   Note: You can run these 2 scripts sequentially to generate metrics:
+
+- `pnpm dev:metrics:generator`
+- `pnpm dev:sqs:buffer`
+
+```bash
+curl -X POST \
+  'http://localhost:8081/metrics/{userId}' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "type": "distance",
+    "value": 0,
+    "unit": "meter",
+    "date": "2026-03-15T02:09:54.820Z"
+```
+
+![postman](./images/add-metric-postman.png)
+
+2. List metrics
+
+```bash
+curl -X GET \
+  'http://localhost:8081/metrics/{userId}/list?type=distance&limit=50&offset=0' \
+  -H 'accept: application/json'
+```
+
+![postman](./images/list-metric-postman.png)
+
+3. Get chart data
+
+```bash
+curl -X GET \
+  'http://localhost:8081/metrics/{userId}/chart?type=distance' \
+  -H 'accept: application/json'
+```
+
+![postman](./images/get-chart-data-postman.png)
+
 ## Scripts Reference
 
-| Script                         | Description                                                |
-|--------------------------------|------------------------------------------------------------|
-| `pnpm build`                   | TypeScript compile + bundle with tsup                     |
-| `pnpm start:dev:*`             | Hot-reload dev server (tsx --watch)                       |
-| `pnpm start:*`                 | Production server from dist/                              |
-| `pnpm test`                    | Run tests with Vitest                                     |
-| `pnpm test:cov`                | Tests with coverage report                                |
-| `pnpm prisma:migrate`          | Run database migrations                                   |
-| `pnpm dev:metrics:generator`   | Generate metrics (default 1k every 5 minutes via SQS)     |
-| `pnpm dev:sqs:buffer`          | Buffer SQS messages then batch-insert metrics into Postgres |
+| Script                       | Description                                                 |
+| ---------------------------- | ----------------------------------------------------------- |
+| `pnpm build`                 | TypeScript compile + bundle with tsup                       |
+| `pnpm start:dev:*`           | Hot-reload dev server (tsx --watch)                         |
+| `pnpm start:*`               | Production server from dist/                                |
+| `pnpm test`                  | Run tests with Vitest                                       |
+| `pnpm test:cov`              | Tests with coverage report                                  |
+| `pnpm prisma:migrate`        | Run database migrations                                     |
+| `pnpm dev:metrics:generator` | Generate metrics (default 1k every 5 minutes via SQS)       |
+| `pnpm dev:sqs:buffer`        | Buffer SQS messages then batch-insert metrics into Postgres |

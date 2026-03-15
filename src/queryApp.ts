@@ -19,24 +19,26 @@ app.use(openAPIRouter);
 finalize(app);
 
 const server = app.listen(env.QUERY_PORT, async () => {
-	logger.info(`Query service (${env.NODE_ENV}) running on port ${env.QUERY_PORT}`);
+  logger.info(
+    `Query service (${env.NODE_ENV}) running on port ${env.QUERY_PORT}`,
+  );
 
-	try {
-		await connectRedis();
-		logger.info("Redis connected");
-	} catch (err) {
-		logger.error({ err }, "Failed to connect to Redis");
-	}
+  try {
+    await connectRedis();
+    logger.info("Redis connected");
+  } catch (err) {
+    logger.error({ err }, "Failed to connect to Redis");
+  }
 });
 
 const onCloseSignal = async () => {
-	logger.info("Shutting down query service");
-	await disconnectRedis();
-	server.close(() => {
-		logger.info("Query service closed");
-		process.exit();
-	});
-	setTimeout(() => process.exit(1), 10000).unref();
+  logger.info("Shutting down query service");
+  await disconnectRedis();
+  server.close(() => {
+    logger.info("Query service closed");
+    process.exit();
+  });
+  setTimeout(() => process.exit(1), 10000).unref();
 };
 
 process.on("SIGINT", onCloseSignal);
